@@ -143,13 +143,17 @@ class BasicLane(Lane):
         return 'BasicLane'
 
 
+class AnnotationSide:
+    Center, Left, Right = range(3)
+
 # lane will split into multiple lanes
 class SplitLane(Lane):
-    __slots__ = ['number', 'annotations']
+    __slots__ = ['number', 'annotations', 'side']
 
-    def __init__(self, number=2, annotations=[]):
+    def __init__(self, number=2, annotations=[], side=AnnotationSide.Right):
         super(SplitLane, self).__init__(annotations=annotations, type="split")
         self.number = number
+        self.side = side
 
     def __repr__(self):
         return 'SplitLane'
@@ -159,18 +163,16 @@ class SplitLane(Lane):
 class JoinLane(Lane):
     __slots__ = ['number', 'annotations']
 
-    def __init__(self, number=2, annotations=[]):
+    def __init__(self, number=2, annotations=[], side=AnnotationSide.Right):
         super(JoinLane, self).__init__(annotations=annotations, type="join")
         self.number = number
         self.annotations = annotations
+        self.side = side
 
     def __repr__(self):
         return 'JoinLane'
 
 
-# Insert comment here...
-class AnnotationSide:
-    Center, Left, Right = range(3)
 
 
 # Insert comment here...
