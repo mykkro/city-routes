@@ -1,0 +1,9 @@
+{% macro head(dir, title) %}
+  <head>
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{{ dir }}/css/bootstrap.min.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="{{ dir }}/css/style.css" type="text/css" media="screen" />
+    <script src="{{ dir }}/js/jquery-3.1.1.min.js"></script>
+    <script src="{{ dir }}/js/Base.js"></script>
+  </head>
+{% endmacro %}

@@ -1,0 +1,22 @@
+Position { x:float, y:float, z:float }
+Node { position: Position }
+Edge { from: Node, to: Node }
+
+Road { alongEdge: Edge, ways: Way[], annotations: RoadAnnotation[] }
+
+Way { reversed: boolean, segments: WaySegment[] }
+WaySegment { length: float, annotations: RoadAnnotation[] }
+
+Lane { width: float, annotations: LaneAnnotation[] }
+BasicLane(Lane) { width: float }
+SplitLane(Lane) { number: integer(2) }  # lane will split into multiple lanes
+JoinLane(Lane) { number: integer(2) }  # several neighboring lanes will merge into one
+
+AnnotationSide enum(Center,Left,Right)
+Annotation { position: float, side: AnnotationSide, length: float }
+LaneAnnotation(Annotation) {} # road sign, horizontal sign on the road
+WayAnnotation(Annotation) {} # road sign, semaphore, parking
+RoadAnnotation(Annotation) {}
+
+ParkingStripParallel(WayAnnotation) { width: float }
+ParkingStripForward(WayAnnotation) { boxWidth: float, boxLength: float, boxAngle: float }
