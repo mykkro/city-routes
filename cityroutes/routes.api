@@ -1,6 +1,6 @@
 Position { x:float, y:float, z:float }
 Node { position: Position }
-Edge { from: Node, to: Node }
+Edge { start: Node, end: Node }
 
 Road { alongEdge: Edge, ways: Way[], annotations: RoadAnnotation[] }
 
