@@ -2,6 +2,30 @@ from roadmeshgen.Vec2d import Vec2d
 
 
 # Insert comment here...
+class Graph(object):
+    __slots__ = ['nodes', 'edges']
+
+    def __init__(self):
+        self.nodes = []
+        self.edges = []
+
+    def __repr__(self):
+        return 'Graph'
+
+    def addNode(self, position):
+        node = Node(position=position)
+        self.nodes.append(node)
+        return node
+
+    def addEdge(self, start, end):
+        edge = Edge(start=start, end=end)
+        self.edges.append(edge)
+        start.neighbors.append(end)
+        end.neighbors.append(start)
+        return edge
+
+
+# Insert comment here...
 class Position(object):
     __slots__ = ['x', 'y']
 
@@ -18,10 +42,11 @@ class Position(object):
 
 # Insert comment here...
 class Node(object):
-    __slots__ = ['position']
+    __slots__ = ['position', 'neighbors']
 
     def __init__(self, position=Position(0,0)):
         self.position = position
+        self.neighbors = []
 
     def __repr__(self):
         return 'Node(position=%s)' % str(self.position)
@@ -95,15 +120,22 @@ class WaySegment(object):
 
 # Insert comment here...
 class Lane(object):
+    __slots__ = ['annotations', 'type']
+
+    def __init__(self, type, annotations=[]):
+        self.annotations = annotations
+        self.type = type
+
     def __repr__(self):
         return 'Lane'
 
 
 # Insert comment here...
 class BasicLane(Lane):
-    __slots__ = ['width', 'annotations']
+    __slots__ = ['width']
 
-    def __init__(self, width, annotations):
+    def __init__(self, width=3.0, annotations=[]):
+        super(BasicLane, self).__init__(annotations=annotations, type="basic")
         self.width = width
         self.annotations = annotations
 
@@ -113,9 +145,10 @@ class BasicLane(Lane):
 
 # lane will split into multiple lanes
 class SplitLane(Lane):
-    __slots__ = ['number']
+    __slots__ = ['number', 'annotations']
 
-    def __init__(self, number=2):
+    def __init__(self, number=2, annotations=[]):
+        super(SplitLane, self).__init__(annotations=annotations, type="split")
         self.number = number
 
     def __repr__(self):
@@ -124,10 +157,12 @@ class SplitLane(Lane):
 
 # several neighboring lanes will merge into one
 class JoinLane(Lane):
-    __slots__ = ['number']
+    __slots__ = ['number', 'annotations']
 
-    def __init__(self, number=2):
+    def __init__(self, number=2, annotations=[]):
+        super(JoinLane, self).__init__(annotations=annotations, type="join")
         self.number = number
+        self.annotations = annotations
 
     def __repr__(self):
         return 'JoinLane'
