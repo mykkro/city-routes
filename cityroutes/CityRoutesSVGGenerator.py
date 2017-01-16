@@ -41,13 +41,16 @@ class CityRoutesSVGGenerator:
         self.dwg.add(self.dwg.circle((pos.x, pos.y), radius, fill=color))
         self.dwg.add(self.dwg.line((pos.x, pos.y), (pos.x+length*dir.x, pos.y+length*dir.y), stroke=color))
 
-    def line(self, start, end, color):
+    def line(self, start, end, color=None):
+        color = color or self.color(0,0,0)
         self.dwg.add(self.dwg.line((start.x, start.y), (end.x, end.y), stroke=color, stroke_width=3))
 
-    def rect(self, pos, size, color):
+    def rect(self, pos, size, color=None):
+        color = color or self.color(0,0,0)
         self.dwg.add(self.dwg.rect((pos.x, pos.y), (size.x, size.y), fill=color))
 
-    def path(self, points, color):
+    def path(self, points, color=None):
+        color = color or self.color(0,0,0)
         d = " ".join(map(lambda (i,p): "%s%.1f,%.1f" % ("M" if i==0 else "L", p.x, p.y), enumerate(points))) + "z"
         self.dwg.add(self.dwg.path(d=d, fill=color))
 

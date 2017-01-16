@@ -67,4 +67,7 @@ r1 = cr.Road(alongEdge=e1, ways=[
             cr.ParkingStripParallel(width=2.5, length=80, position=30)
         ])
     ])
+], annotations=[
+    cr.Crossing(position=110, width=6.0),
+    cr.Crossing(position=230, width=8.0)
 ])

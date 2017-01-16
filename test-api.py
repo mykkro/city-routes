@@ -192,10 +192,31 @@ for j in range(0, len(road.ways)):
             placeSign(ann, bl, br, origin, xaxis, yaxis)
 
 
-    csvg.border(way.rightBorder(), color=None, origin=origin, xaxis=xaxis, yaxis=yaxis)
+    # csvg.border(way.rightBorder(), color=None, origin=origin, xaxis=xaxis, yaxis=yaxis)
 
-bbb = road.leftBorder()
-csvg.border(bbb, color=None, origin=pa, xaxis=xvec, yaxis=yvec)
+
+br = road.rightBorder()
+bl = road.leftBorder()
+
+for ann in road.road.annotations:
+    print "Road annotation", ann
+    if isinstance(ann, cr.Crossing):
+        print ann.position, ann.width
+        stripeWidth = 1.0
+        cx = ann.position
+        ymin = bl.width(cx)
+        ymax = br.width(cx)
+        y = ymin
+        while y < ymax:
+            p0 = Vec2d(cx - ann.width/2, y)
+            p1 = Vec2d(cx + ann.width/2, y)
+            p2 = Vec2d(cx + ann.width/2, y+stripeWidth)
+            p3 = Vec2d(cx - ann.width/2, y+stripeWidth)
+            csvg.quad(p0, p1, p2, p3, pa, xvec, yvec, color=csvg.color(100, 100, 100))
+            y += 2*stripeWidth
+
+csvg.border(br, color=None, origin=pa, xaxis=xvec, yaxis=yvec)
+csvg.border(bl, color=None, origin=pa, xaxis=xvec, yaxis=yvec)
 
 csvg.save()
 

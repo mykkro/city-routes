@@ -248,3 +248,14 @@ class ParkingStripForward(WayAnnotation):
 
     def __repr__(self):
         return 'ParkingStripForward'
+
+
+class Crossing(WayAnnotation):
+    __slots__ = ['width']
+
+    def __init__(self, position=None, width=5.0):
+        super(Crossing, self).__init__(position=position)
+        self.width = width
+
+    def __repr__(self):
+        return 'Crossing'
