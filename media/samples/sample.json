@@ -1,0 +1,233 @@
+{
+  "$type": "Graph",
+  "nodes": [
+    {
+      "$type": "Node",
+      "name": "n1",
+      "x": 10,
+      "y": 10
+    },
+    {
+      "$type": "Node",
+      "name": "n2",
+      "x": 180,
+      "y": 180
+    }
+  ],
+  "edges": [
+    {
+      "$type": "Edge",
+      "start": "n1",
+      "end": "n2",
+      "name": "e1"
+    }
+  ],
+  "roads": [
+    {
+      "$type": "Road",
+      "alongEdge": "e1",
+      "ways": [
+        {
+          "$type": "Way",
+          "segments": [
+            {
+              "$type": "WaySegment",
+              "length": 100,
+              "lanes": [
+                {
+                  "$type": "BasicLane",
+                  "width": 3.0,
+                  "annotations": []
+                },
+                {
+                  "$type": "BasicLane",
+                  "width": 3.0,
+                  "annotations": [
+                  ]
+                }
+              ],
+              "annotations": [
+                {
+                  "$type": "ParkingStripForward",
+                  "length": 50,
+                  "position": 20,
+                  "side": "right",
+                  "boxAngle": 90,
+                  "boxLength": 5,
+                  "boxWidth": 3
+                },
+                {
+                  "$type": "Sign",
+                  "name": "P1",
+                  "position": 10,
+                  "side": "right"
+                }
+              ]
+            },
+            {
+              "$type": "WaySegment",
+              "length": 20,
+              "lanes": [
+                {
+                  "$type": "SplitLane",
+                  "number": 2
+                },
+                {
+                  "$type": "BasicLane",
+                  "width": 3.0,
+                  "annotations": [
+                  ]
+                }
+              ],
+              "annotations": [
+                {
+                  "$type": "TrafficLight",
+                  "position": 10
+                }
+              ]
+            },
+            {
+              "$type": "WaySegment",
+              "lanes": [
+                {
+                  "$type": "BasicLane",
+                  "width": 3.0,
+                  "annotations": [
+                  ]
+                },
+                {
+                  "$type": "BasicLane",
+                  "width": 3.0,
+                  "annotations": [
+                  ]
+                },
+                {
+                  "$type": "BasicLane",
+                  "width": 3.0,
+                  "annotations": [
+                  ]
+                }
+              ],
+              "annotations": [
+                {
+                  "$type": "Sign",
+                  "name": "A4",
+                  "position": 30,
+                  "side": "right"
+                }
+              ]
+            }
+          ],
+          "annotations": [
+            {
+              "$type": "Sign",
+              "name": "B02",
+              "position": 100,
+              "side": "right"
+            }
+          ]
+        },
+        {
+          "$type": "Way",
+          "reversed": true,
+          "segments": [
+            {
+              "$type": "WaySegment",
+              "length": 80,
+              "lanes": [
+                {
+                  "$type": "BasicLane",
+                  "width": 3.0,
+                  "annotations": [
+                  ]
+                },
+                {
+                  "$type": "BasicLane",
+                  "width": 3.0,
+                  "annotations": [
+                  ]
+                }
+              ],
+              "annotations": [
+                {
+                  "$type": "TrafficLight",
+                  "position": 20
+                },
+                {
+                  "$type": "ParkingStripParallel",
+                  "width": 2.5,
+                  "length": 40,
+                  "position": 30
+                },
+                {
+                  "$type": "Sign",
+                  "name": "IP06",
+                  "position": 30,
+                  "side": "right"
+                },
+                {
+                  "$type": "Sign",
+                  "name": "A11",
+                  "position": 75,
+                  "side": "right"
+                }
+              ]
+            },
+            {
+              "$type": "WaySegment",
+              "length": 30,
+              "lanes": [
+                {
+                  "$type": "JoinLane",
+                  "number": 2,
+                  "annotations": [],
+                  "side": "left"
+                }
+              ],
+              "annotations": [
+              ]
+            },
+            {
+              "$type": "WaySegment",
+              "lanes": [
+                {
+                  "$type": "BasicLane",
+                  "width": 3.0,
+                  "annotations": [
+                  ]
+                }
+              ],
+              "annotations": [
+                {
+                  "$type": "ParkingStripParallel",
+                  "width": 2.5,
+                  "length": 80,
+                  "position": 30
+                }
+              ]
+            }
+          ],
+          "annotations": [
+            {
+              "$type": "TrafficLight",
+              "position": 120
+            }
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "$type": "Crossing",
+          "position": 110,
+          "width": 6.0
+        },
+        {
+          "$type": "Crossing",
+          "position": 230,
+          "width": 8.0
+        }
+      ]
+    }
+  ]
+}
+

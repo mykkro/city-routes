@@ -1,9 +1,20 @@
+import json
 from cityroutes import cityroutes as cr
 from cityroutes.cityroutes import AnnotationSide
 from roadmeshgen.Vec2d import Vec2d
 from cityroutes.Border import Border
 from cityroutes.CityRoutesSVGGenerator import CityRoutesSVGGenerator
-from cityroutes.sample import r1, pa, pb
+
+
+
+
+path = "media/samples/sample.json"
+with open(path, "rb") as infile:
+    data = json.load(infile)
+    graph = cr.readGraph(data)
+    r1 = graph.roads[0]
+
+
 
 csvg = CityRoutesSVGGenerator()
 csvg.grid()
@@ -99,8 +110,8 @@ for way in ways:
 
 
 
-pa = pa.vec2d()
-pb = pb.vec2d()
+pa = r1.alongEdge.start.position.vec2d()
+pb = r1.alongEdge.end.position.vec2d()
 xvec = (pb - pa).normalized()
 yvec = xvec.perpendicular()
 
