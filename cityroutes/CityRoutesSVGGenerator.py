@@ -38,7 +38,7 @@ class CityRoutesSVGGenerator:
         self.dwg.add(self.dwg.line((pos.x, pos.y), (pos.x+length*dir.x, pos.y+length*dir.y), stroke=color))
 
     def line(self, start, end, color):
-        self.dwg.add(self.dwg.line((start.x, start.y), (end.x, end.y), stroke=color))
+        self.dwg.add(self.dwg.line((start.x, start.y), (end.x, end.y), stroke=color, stroke_width=3))
 
     def rect(self, pos, size, color):
         self.dwg.add(self.dwg.rect((pos.x, pos.y), (size.x, size.y), fill=color))

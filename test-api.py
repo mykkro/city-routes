@@ -2,6 +2,7 @@ import os, sys
 from cityroutes import cityroutes as cr
 import random
 from roadmeshgen.Vec2d import Vec2d
+from cityroutes.Border import Border
 import os, sys, json
 from svg.path import Path, Line, Arc, CubicBezier, QuadraticBezier
 from svg.path import parse_path
@@ -103,16 +104,23 @@ class WayNode(object):
         ratio = float(off)/seg.segLength
         return seg.width(ratio)
 
+    def leftBorder(self):
+        return Border.merge(map(lambda s: s.leftBorder(), self.segments))
+
+    def rightBorder(self):
+        return Border.merge(map(lambda s: s.rightBorder(), self.segments))
+
 
 class SegNode(object):
-    __slots__ = ['inSegment', 'outSegment', 'segLength', 'segment', 'lanes', 'inOffset', 'outOffset']
+    __slots__ = ['inSegment', 'outSegment', 'segLength', 'segStart', 'segment', 'lanes', 'inOffset', 'outOffset']
 
-    def __init__(self, seg, segLength):
+    def __init__(self, seg, segLength, segStart):
         self.inSegment = None
         self.outSegment = None
         self.inOffset = None
         self.outOffset = None
         self.segLength = segLength
+        self.segStart = segStart
         self.segment = seg
         self.lanes = []
 
@@ -134,6 +142,12 @@ class SegNode(object):
             w += l.width(alpha)
         return w
 
+    def leftBorder(self):
+        return self.lanes[0].leftBorder()
+
+    def rightBorder(self):
+        return self.lanes[-1].rightBorder()
+
 
 class LaneNode(object):
     __slots__ = ['inLanes', 'inWidth', 'outLanes', 'outWidth', 'lane', 'segNode', 'inOffset', 'outOffset']
@@ -148,8 +162,23 @@ class LaneNode(object):
         self.lane = lane
         self.segNode = segNode
 
+    def start(self):
+        return self.segNode.segStart
+
+    def length(self):
+        return self.segNode.segLength
+
     def width(self, alpha):
         return alpha*self.outWidth + (1-alpha)*self.inWidth
+
+    def leftBorder(self):
+        return Border([Vec2d(0, self.inOffset * 10), Vec2d(self.length(), self.outOffset * 10)])
+
+    def rightBorder(self):
+        return Border([Vec2d(0, (self.inOffset+self.inWidth)*10), Vec2d(self.length(), (self.outOffset+self.outWidth)*10)])
+
+    def body(self):
+        return Border([Vec2d(0, self.inWidth*10), Vec2d(self.length(), self.outWidth*10)])
 
 
 def transformPoint(p, origin=Vec2d(0,0), xaxis=Vec2d(1,0), yaxis=Vec2d(0,1)):
@@ -183,7 +212,7 @@ for way in ways:
     for seg in way.segments:
         rest = roadLen - segLenTotal
         segLength = seg.length or rest
-        segNode = SegNode(seg=seg, segLength=segLength)
+        segNode = SegNode(seg=seg, segLength=segLength, segStart=segLenTotal)
         segNodes.append(segNode)
         wayNode.segments.append(segNode)
         x1 = segLenTotal
@@ -283,6 +312,16 @@ origin = pa
 xaxis = xvec
 yaxis = yvec
 
+def drawBorder(bb, color=None, origin=Vec2d(0,0), xaxis=Vec2d(1,0), yaxis=Vec2d(0,1)):
+    color = color or csvg.color(0,0,0)
+    for pt in bb.points:
+        csvg.bigpoint(transformPoint(pt, origin, xaxis, yaxis))
+    for i in range(0, len(bb.points)-1):
+        startpt = bb.points[i]
+        endpt = bb.points[i+1]
+        csvg.line(transformPoint(startpt, origin, xaxis, yaxis), transformPoint(endpt, origin, xaxis, yaxis), color)
+
+
 for j in range(0, len(wayNodes)):
     way = wayNodes[j]
 
@@ -320,12 +359,48 @@ for j in range(0, len(wayNodes)):
             renderQuad(Vec2d(x, inOffset*10), Vec2d(x, (iw+inOffset)*10), Vec2d(x+dseg, (ow+outOffset)*10), Vec2d(x+dseg, outOffset*10), origin, xaxis, yaxis, csvg.color(ndx * 20, 0, 100))
             lane.inOffset = inOffset
             lane.outOffset = outOffset
+
+            #oo = origin + xaxis * lane.start()
+            #drawBorder(lane.rightBorder(), color=None, origin=oo, xaxis=xaxis, yaxis=yaxis)
+
             inOffset += iw
             outOffset += ow
         x += segment.segLength
         ndx += 1
 
+        #oo = origin + xaxis * segment.segStart
+        #drawBorder(segment.rightBorder(), color=None, origin=oo, xaxis=xaxis, yaxis=yaxis)
+
+    drawBorder(way.rightBorder(), color=None, origin=origin, xaxis=xaxis, yaxis=yaxis)
+
+
+# simple Border API
+
+
+
+bb = Border([Vec2d(0, 30), Vec2d(20, 40), Vec2d(35, 45), Vec2d(45, 30), Vec2d(50, 20)])
+bb2 = Border([Vec2d(0, 20), Vec2d(30, 20), Vec2d(50, 10)])
+
+
+drawBorder(bb, csvg.color(0,100,0))
+drawBorder(bb2, csvg.color(0,50,0))
+
+bb3 = bb.join(bb2, add=False)
+bb4 = bb3.join(bb2, add=True)
+print bb.points
+print bb2.points
+print bb3.points
+print bb4.points
+
+bb5 = Border.merge([bb, bb2])
+print bb5.points
+
+drawBorder(bb3, csvg.color(0,0,0))
+drawBorder(bb4.flipped(), csvg.color(50,0,0))
+drawBorder(bb5, csvg.color(50,0,0))
+
 csvg.save()
+
 
 
 print r1, r1.length()
