@@ -109,6 +109,21 @@ xaxis = xvec
 yaxis = yvec
 
 
+def placeSign(ann, bl, br, oo, xaxis, yaxis):
+    if ann.side == AnnotationSide.Right:
+        signx = ann.position
+        signy = br.width(signx)
+        signy += 2
+    elif ann.side == AnnotationSide.Left:
+        signx = ann.position
+        signy = bl.width(signx)
+        signy -= 2
+    else:
+        signx = ann.position
+        signy = (bl.width(signx) + br.width(signx))/2
+    pt = csvg.transformPoint(Vec2d(signx, signy), oo, xaxis, yaxis)
+    csvg.sign(ann.name, (pt.x, pt.y))
+
 for j in range(0, len(road.ways)):
     way = road.ways[j]
 
@@ -156,32 +171,28 @@ for j in range(0, len(road.ways)):
         br = segment.rightBorder()
         bl = segment.leftBorder()
         oo = origin + xaxis * segment.segStart
-        for ann in segment.segment.annotations:
-            print ann
-            if isinstance(ann, cr.Sign):
-                print "Sign:", ann.position, ann.name, ann.side
-                # get sign position
-                if ann.side == AnnotationSide.Right:
-                    signx = ann.position
-                    signy = br.width(signx)
-                    signy += 1
-                elif ann.side == AnnotationSide.Left:
-                    signx = ann.position
-                    signy = bl.width(signx)
-                    signy -= 1
-                else:
-                    signx = ann.position
-                    signy = (bl.width(signx) + br.width(signx))/2
-                pt = csvg.transformPoint(Vec2d(signx, signy), oo, xaxis, yaxis)
-                csvg.sign(ann.name, (pt.x, pt.y))
 
+
+        for ann in segment.segment.annotations:
+            print "Segment annotation", ann
+            if isinstance(ann, cr.Sign):
+                placeSign(ann, bl, br, oo, xaxis, yaxis)
 
         x += segment.segLength
         ndx += 1
 
         #drawBorder(segment.rightBorder(), color=None, origin=oo, xaxis=xaxis, yaxis=yaxis)
 
-    #drawBorder(way.rightBorder(), color=None, origin=origin, xaxis=xaxis, yaxis=yaxis)
+    br = way.rightBorder()
+    bl = way.leftBorder()
+
+    for ann in way.way.annotations:
+        print "Way annotation", ann
+        if isinstance(ann, cr.Sign):
+            placeSign(ann, bl, br, origin, xaxis, yaxis)
+
+
+    csvg.border(way.rightBorder(), color=None, origin=origin, xaxis=xaxis, yaxis=yaxis)
 
 bbb = road.leftBorder()
 csvg.border(bbb, color=None, origin=pa, xaxis=xvec, yaxis=yvec)

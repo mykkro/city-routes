@@ -95,11 +95,12 @@ Road
 
 # Insert comment here...
 class Way(object):
-    __slots__ = ['reversed', 'segments']
+    __slots__ = ['reversed', 'segments', 'annotations']
 
-    def __init__(self, reversed=False, segments=[]):
+    def __init__(self, reversed=False, segments=[], annotations=[]):
         self.reversed = reversed
         self.segments = segments
+        self.annotations = annotations
 
     def __repr__(self):
         return 'Way'

@@ -39,6 +39,8 @@ r1 = cr.Road(alongEdge=e1, ways=[
         ], annotations=[
             cr.Sign(name="A4", position=30, side=cr.AnnotationSide.Right)
         ])
+    ], annotations=[
+        cr.Sign(name="B02", position=100, side=cr.AnnotationSide.Right)
     ]),
     cr.Way(reversed=True, segments=[
         cr.WaySegment(length=80, lanes=[
