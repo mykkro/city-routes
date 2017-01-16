@@ -27,6 +27,7 @@ r1 = cr.Road(alongEdge=e1, ways=[
 
             ])
         ], annotations=[
+            cr.TrafficLight(position=10)
         ]),
         cr.WaySegment(lanes=[
             cr.BasicLane(width=3.0, annotations=[
@@ -51,6 +52,7 @@ r1 = cr.Road(alongEdge=e1, ways=[
                 # lane annotations go here...
             ])
         ], annotations=[
+            cr.TrafficLight(position=20),
             cr.ParkingStripParallel(width=2.5, length=40, position=30),
             cr.Sign(name="IP06", position=30, side=cr.AnnotationSide.Right),
             cr.Sign(name="A11", position=75, side=cr.AnnotationSide.Right)
@@ -66,6 +68,8 @@ r1 = cr.Road(alongEdge=e1, ways=[
         ], annotations=[
             cr.ParkingStripParallel(width=2.5, length=80, position=30)
         ])
+    ], annotations=[
+        cr.TrafficLight(position=120)
     ])
 ], annotations=[
     cr.Crossing(position=110, width=6.0),

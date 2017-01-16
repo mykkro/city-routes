@@ -259,3 +259,18 @@ class Crossing(WayAnnotation):
 
     def __repr__(self):
         return 'Crossing'
+
+class TrafficLightType:
+    Normal, Pedestrian = range(2)
+
+
+class TrafficLight(WayAnnotation):
+    __slots__ = ['type', 'orientation']
+
+    def __init__(self, position=None, side=AnnotationSide.Right, type=TrafficLightType.Normal, orientation=0.0):
+        super(TrafficLight, self).__init__(position=position, side=side)
+        self.type = type
+        self.orientation = orientation
+
+    def __repr__(self):
+        return 'TrafficLight'

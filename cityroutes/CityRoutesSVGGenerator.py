@@ -63,6 +63,10 @@ class CityRoutesSVGGenerator:
         position = position or (0,0)
         return self.image("media/signs/%s.png" % name, size=(signSize,signSize), insert=(position[0]-signSize/2, position[1]-signSize/2))
 
+    def trafficLight(self, position=None, size=20):
+        position = position or (0,0)
+        return self.image("media/icons/trafficlight.png", size=(size,size), insert=(position[0]-size/2, position[1]-size/2))
+
     def transformPoint(self, p, origin=Vec2d(0,0), xaxis=Vec2d(1,0), yaxis=Vec2d(0,1)):
         return Vec2d((origin.x + xaxis.x*p.x + yaxis.x*p.y) *5, (origin.y + xaxis.y*p.x + yaxis.y*p.y) *5)
 

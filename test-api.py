@@ -124,6 +124,23 @@ def placeSign(ann, bl, br, oo, xaxis, yaxis):
     pt = csvg.transformPoint(Vec2d(signx, signy), oo, xaxis, yaxis)
     csvg.sign(ann.name, (pt.x, pt.y))
 
+
+def placeTrafficLight(ann, bl, br, oo, xaxis, yaxis):
+    if ann.side == AnnotationSide.Right:
+        signx = ann.position
+        signy = br.width(signx)
+        signy += 2
+    elif ann.side == AnnotationSide.Left:
+        signx = ann.position
+        signy = bl.width(signx)
+        signy -= 2
+    else:
+        signx = ann.position
+        signy = (bl.width(signx) + br.width(signx))/2
+    pt = csvg.transformPoint(Vec2d(signx, signy), oo, xaxis, yaxis)
+    csvg.trafficLight((pt.x, pt.y))
+
+
 for j in range(0, len(road.ways)):
     way = road.ways[j]
 
@@ -177,6 +194,8 @@ for j in range(0, len(road.ways)):
             print "Segment annotation", ann
             if isinstance(ann, cr.Sign):
                 placeSign(ann, bl, br, oo, xaxis, yaxis)
+            elif isinstance(ann, cr.TrafficLight):
+                placeTrafficLight(ann, bl, br, oo, xaxis, yaxis)
 
         x += segment.segLength
         ndx += 1
@@ -190,6 +209,8 @@ for j in range(0, len(road.ways)):
         print "Way annotation", ann
         if isinstance(ann, cr.Sign):
             placeSign(ann, bl, br, origin, xaxis, yaxis)
+        elif isinstance(ann, cr.TrafficLight):
+            placeTrafficLight(ann, bl, br, oo, xaxis, yaxis)
 
 
     # csvg.border(way.rightBorder(), color=None, origin=origin, xaxis=xaxis, yaxis=yaxis)
