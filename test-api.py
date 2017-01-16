@@ -1,6 +1,8 @@
 import os, sys
 from cityroutes import cityroutes as cr
 import random
+
+from cityroutes.cityroutes import AnnotationSide
 from roadmeshgen.Vec2d import Vec2d
 from cityroutes.Border import Border
 import os, sys, json
@@ -49,6 +51,20 @@ r1 = cr.Road(alongEdge=e1, ways=[
         ])
     ]),
     cr.Way(reversed=True, segments=[
+        cr.WaySegment(length=200, lanes=[
+            cr.BasicLane(width=3.0, annotations=[
+                # lane annotations go here...
+            ]),
+            cr.BasicLane(width=3.0, annotations=[
+                # lane annotations go here...
+            ])
+        ], annotations=[
+            cr.ParkingStripParallel(width=2.5, length=80, position=30)
+        ]),
+        cr.WaySegment(length=30, lanes=[
+            cr.JoinLane(number=2, annotations=[], side=AnnotationSide.Left)
+        ], annotations=[
+        ]),
         cr.WaySegment(lanes=[
             cr.BasicLane(width=3.0, annotations=[
                 # lane annotations go here...
@@ -68,118 +84,8 @@ csvg.grid()
 csvg.edge(r1.alongEdge)
 
 # TODO: LaneGraph
-class WayNode(object):
-    __slots__ = ['way', 'segments']
 
-    def __init__(self, way):
-        self.way = way
-        self.segments = []
-
-    def widths(self):
-        ww = [0] * (len(self.segments)+1)
-        for i in range(0, len(self.segments)):
-            ww[i] = self.segments[i].inWidth()
-        ww[i+1] = self.segments[i].outWidth()
-        return ww
-
-    def length(self):
-        ll = 0
-        for seg in self.segments:
-            ll += seg.segLength
-        return ll
-
-    def segmentAt(self, d):
-        dist = 0
-        for seg in self.segments:
-            if (dist <= d) and (dist + seg.segLength > d):
-                return (seg, d-dist)
-            dist += seg.segLength
-        # return last segment....
-        return (self.segments[-1], self.segments[-1].segLength)
-
-    def width(self, d):
-        ss = self.segmentAt(d)
-        seg = ss[0]
-        off = ss[1]
-        ratio = float(off)/seg.segLength
-        return seg.width(ratio)
-
-    def leftBorder(self):
-        return Border.merge(map(lambda s: s.leftBorder(), self.segments))
-
-    def rightBorder(self):
-        return Border.merge(map(lambda s: s.rightBorder(), self.segments))
-
-
-class SegNode(object):
-    __slots__ = ['inSegment', 'outSegment', 'segLength', 'segStart', 'segment', 'lanes', 'inOffset', 'outOffset']
-
-    def __init__(self, seg, segLength, segStart):
-        self.inSegment = None
-        self.outSegment = None
-        self.inOffset = None
-        self.outOffset = None
-        self.segLength = segLength
-        self.segStart = segStart
-        self.segment = seg
-        self.lanes = []
-
-    def inWidth(self):
-        w = 0
-        for l in self.lanes:
-            w += l.inWidth
-        return w
-
-    def outWidth(self):
-        w = 0
-        for l in self.lanes:
-            w += l.outWidth
-        return w
-
-    def width(self, alpha):
-        w = 0
-        for l in self.lanes:
-            w += l.width(alpha)
-        return w
-
-    def leftBorder(self):
-        return self.lanes[0].leftBorder()
-
-    def rightBorder(self):
-        return self.lanes[-1].rightBorder()
-
-
-class LaneNode(object):
-    __slots__ = ['inLanes', 'inWidth', 'outLanes', 'outWidth', 'lane', 'segNode', 'inOffset', 'outOffset']
-
-    def __init__(self, lane, segNode):
-        self.inLanes = []
-        self.outLanes = []
-        self.inWidth = None
-        self.outWidth = None
-        self.inOffset = None
-        self.outOffset = None
-        self.lane = lane
-        self.segNode = segNode
-
-    def start(self):
-        return self.segNode.segStart
-
-    def length(self):
-        return self.segNode.segLength
-
-    def width(self, alpha):
-        return alpha*self.outWidth + (1-alpha)*self.inWidth
-
-    def leftBorder(self):
-        return Border([Vec2d(0, self.inOffset * 10), Vec2d(self.length(), self.outOffset * 10)])
-
-    def rightBorder(self):
-        return Border([Vec2d(0, (self.inOffset+self.inWidth)*10), Vec2d(self.length(), (self.outOffset+self.outWidth)*10)])
-
-    def body(self):
-        return Border([Vec2d(0, self.inWidth*10), Vec2d(self.length(), self.outWidth*10)])
-
+from cityroutes.street import LaneNode, SegNode, WayNode, RoadNode
 
 def transformPoint(p, origin=Vec2d(0,0), xaxis=Vec2d(1,0), yaxis=Vec2d(0,1)):
     return origin + xaxis*p.x + yaxis*p.y
@@ -200,10 +106,10 @@ csvg.rect(Vec2d(0, yy), Vec2d(roadLen, 10), csvg.color(100, 50, 50))
 yy += 20
 # draw Ways
 ways = r1.ways
-wayNodes = []
+road = RoadNode(r1)
 for way in ways:
     wayNode = WayNode(way)
-    wayNodes.append(wayNode)
+    road.ways.append(wayNode)
     csvg.rect(Vec2d(0, yy), Vec2d(roadLen, 10), csvg.color(50, 100, 50))
     yy += 15
     # draw Segments
@@ -238,7 +144,7 @@ for way in ways:
         while cind < len(curr):
             cc = curr[cind]
             nn = next[nind]
-            if cc.lane.type == "basic":
+            if cc.lane.type == "basic" or cc.lane.type == "join":
                 if nn.lane.type == "basic" or nn.lane.type == "split":
                     # connect basic - basic
                     cc.outLanes = [nn]
@@ -246,7 +152,12 @@ for way in ways:
                     cind += 1
                     nind += 1
                 elif nn.lane.type == "join":
-                    print "Not implemented yet!"
+                    num = nn.lane.number
+                    for k in range(0, num):
+                        nn.inLanes.append(curr[cind+k])
+                        curr[cind+k].outLanes = [nn]
+                    nind += 1
+                    cind += num
             elif cc.lane.type == "split":
                 num = cc.lane.number
                 for k in range(0, num):
@@ -284,7 +195,7 @@ for way in ways:
 
     # render way
     y00 = 100
-    for wn in wayNodes:
+    for wn in road.ways:
         x0 = 0
         for sn in wn.segments:
             y0 = 0
@@ -322,8 +233,8 @@ def drawBorder(bb, color=None, origin=Vec2d(0,0), xaxis=Vec2d(1,0), yaxis=Vec2d(
         csvg.line(transformPoint(startpt, origin, xaxis, yaxis), transformPoint(endpt, origin, xaxis, yaxis), color)
 
 
-for j in range(0, len(wayNodes)):
-    way = wayNodes[j]
+for j in range(0, len(road.ways)):
+    way = road.ways[j]
 
     if way.way.reversed:
         origin = pb
@@ -335,7 +246,7 @@ for j in range(0, len(wayNodes)):
         yaxis = yvec
     x = 0
     ndx = 0
-    if len(wayNodes) == 1:
+    if len(road.ways) == 1:
         offsets = map(lambda x: -x/2, way.widths())
     else:
         offsets = [0] * (len(way.segments) + 1)
@@ -371,9 +282,19 @@ for j in range(0, len(wayNodes)):
         #oo = origin + xaxis * segment.segStart
         #drawBorder(segment.rightBorder(), color=None, origin=oo, xaxis=xaxis, yaxis=yaxis)
 
-    drawBorder(way.rightBorder(), color=None, origin=origin, xaxis=xaxis, yaxis=yaxis)
+    #drawBorder(way.rightBorder(), color=None, origin=origin, xaxis=xaxis, yaxis=yaxis)
 
-
+bbb = road.leftBorder()
+drawBorder(bbb, color=None, origin=pa, xaxis=xvec, yaxis=yvec)
+"""
+print "Border length:", bbb.length()
+x = 0
+while x < bbb.length():
+    w = bbb.width(x)
+    pt = transformPoint(Vec2d(x, w), pa, xvec, yvec)
+    csvg.bigpoint(pt)
+    x += 10
+"""
 # simple Border API
 
 

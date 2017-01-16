@@ -161,7 +161,7 @@ class SplitLane(Lane):
 
 # several neighboring lanes will merge into one
 class JoinLane(Lane):
-    __slots__ = ['number', 'annotations']
+    __slots__ = ['number', 'annotations', 'side']
 
     def __init__(self, number=2, annotations=[], side=AnnotationSide.Right):
         super(JoinLane, self).__init__(annotations=annotations, type="join")

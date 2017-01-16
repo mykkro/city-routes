@@ -31,6 +31,12 @@ class Border(object):
             index += 1
         return self.points[-1].y
 
+    def mirror(self):
+        ll = self.length()
+        pts = map(lambda p: Vec2d(ll-p.x, p.y), self.points)
+        pts.sort(key=lambda pt: pt.x)
+        return Border(pts)
+
     # join the borders together (horizontally), one after another. The y coordinates of overlap points should match
     @staticmethod
     def merge(borders):
