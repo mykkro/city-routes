@@ -212,6 +212,17 @@ class RoadAnnotation(Annotation):
         return 'RoadAnnotation'
 
 
+class Sign(WayAnnotation):
+    __slots__ = ['name']
+
+    def __init__(self, name, position=None, side=AnnotationSide.Right):
+        super(Sign, self).__init__(position=position, side=side)
+        self.name = name
+
+    def __repr__(self):
+        return 'Sign'
+
+
 # Insert comment here...
 class ParkingStripParallel(WayAnnotation):
     __slots__ = ['width']

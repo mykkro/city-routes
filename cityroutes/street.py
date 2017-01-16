@@ -145,10 +145,10 @@ class LaneNode(object):
         return alpha*self.outWidth + (1-alpha)*self.inWidth
 
     def leftBorder(self):
-        return Border([Vec2d(0, self.inOffset * 10), Vec2d(self.length(), self.outOffset * 10)])
+        return Border([Vec2d(0, self.inOffset), Vec2d(self.length(), self.outOffset)])
 
     def rightBorder(self):
-        return Border([Vec2d(0, (self.inOffset+self.inWidth)*10), Vec2d(self.length(), (self.outOffset+self.outWidth)*10)])
+        return Border([Vec2d(0, self.inOffset+self.inWidth), Vec2d(self.length(), self.outOffset+self.outWidth)])
 
     def body(self):
-        return Border([Vec2d(0, self.inWidth*10), Vec2d(self.length(), self.outWidth*10)])
+        return Border([Vec2d(0, self.inWidth), Vec2d(self.length(), self.outWidth)])

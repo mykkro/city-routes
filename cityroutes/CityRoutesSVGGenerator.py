@@ -1,7 +1,11 @@
 import svgwrite
 import random
 
+from roadmeshgen.Vec2d import Vec2d
 
+"""
+    Utility class for rendering road and its parts into SVG.
+"""
 class CityRoutesSVGGenerator:
     def __init__(self):
         self.dwg = svgwrite.Drawing('test.svg', profile='tiny', size=(1000, 1000))
@@ -47,6 +51,25 @@ class CityRoutesSVGGenerator:
         d = " ".join(map(lambda (i,p): "%s%.1f,%.1f" % ("M" if i==0 else "L", p.x, p.y), enumerate(points))) + "z"
         self.dwg.add(self.dwg.path(d=d, fill=color))
 
+    def image(self, href, insert=None, size=None):
+        image = self.dwg.image(href, insert=insert, size=size)
+        self.dwg.add(image)
+        return image
+
+    def sign(self, name, position=None, signSize=20):
+        position = position or (0,0)
+        return self.image("media/signs/%s.png" % name, size=(signSize,signSize), insert=(position[0]-signSize/2, position[1]-signSize/2))
+
+    def transformPoint(self, p, origin=Vec2d(0,0), xaxis=Vec2d(1,0), yaxis=Vec2d(0,1)):
+        return Vec2d((origin.x + xaxis.x*p.x + yaxis.x*p.y) *5, (origin.y + xaxis.y*p.x + yaxis.y*p.y) *5)
+
+    def quad(self, p1, p2, p3, p4, origin=Vec2d(0,0), xaxis=Vec2d(1,0), yaxis=Vec2d(0,1), color=None):
+        t1 = self.transformPoint(p1, origin, xaxis, yaxis)
+        t2 = self.transformPoint(p2, origin, xaxis, yaxis)
+        t3 = self.transformPoint(p3, origin, xaxis, yaxis)
+        t4 = self.transformPoint(p4, origin, xaxis, yaxis)
+        return self.path([t1, t2, t3, t4], color or self.color(0,0,0))
+
     def edge(self, edge):
         start = edge.start.position.vec2d()
         end = edge.end.position.vec2d()
@@ -56,3 +79,12 @@ class CityRoutesSVGGenerator:
 
     def node(self, node):
         self.bigpoint(node.position.vec2d())
+
+    def border(self, bb, color=None, origin=Vec2d(0,0), xaxis=Vec2d(1,0), yaxis=Vec2d(0,1)):
+        color = color or self.color(0,0,0)
+        for pt in bb.points:
+            self.bigpoint(self.transformPoint(pt, origin, xaxis, yaxis))
+        for i in range(0, len(bb.points)-1):
+            startpt = bb.points[i]
+            endpt = bb.points[i+1]
+            self.line(self.transformPoint(startpt, origin, xaxis, yaxis), self.transformPoint(endpt, origin, xaxis, yaxis), color)
